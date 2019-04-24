@@ -7,8 +7,11 @@
 //
 
 #import "MJViewController.h"
+#import <MJWebSocket/MJWebSocketMgr.h>
 
 @interface MJViewController ()
+
+@property (nonatomic, strong) MJWebSocketMgr *mgr;
 
 @end
 
@@ -17,13 +20,31 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+
+    MJSocketConfig *config = [[MJSocketConfig alloc] init];
+    config.serverURL = @"ws://localapp.musjoy.com:2345";
+    config.maxReConnectCount = 5;
+    
+    self.mgr = [[MJWebSocketMgr alloc] initWithConfig:config];
+    [self.mgr startConnect];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:MJWebSocketReceiveMessageNotification object:nil];
+
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)receiveMessage:(NSNotification *)notification {
+    NSLog(@"receiveMessage__ %@", notification.object);
+    
+    NSDictionary *dict = @{
+                           @"type": [NSString stringWithFormat:@"%d", 000000],
+                           };
+    
+    NSData *data= [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
+    
+    NSString *strPing = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    [self.mgr sendMessage:strPing];
 }
+
 
 @end

@@ -18,7 +18,7 @@ TODO: Add long description of the pod here.
   s.homepage         = 'https://github.com/yangyu2010/MJWebSocket'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'yangyu' => 'yangyu2010@aliyun.com' }
-  s.source           = { :git => 'https://github.com/yangyu2010/MJWebSocket.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/yangyu2010/MJWebSocket.git', :tag => "v-#{s.version}" }
 
   s.ios.deployment_target = '9.0'
 

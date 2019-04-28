@@ -8,16 +8,24 @@
 
 #import <Foundation/Foundation.h>
 #import "MJSocketConfig.h"
+#import "MJSocketDelegate.h"
+@class MJWebSocketMgr;
 
-FOUNDATION_EXPORT NSString * const MJWebSocketReceiveMessageNotification;
-FOUNDATION_EXPORT NSString * const MJWebSocketStatusChangeNotification;
+@protocol MJWebSocketMgrDelegate <NSObject>
+/// 接收到消息
+- (void)socket:(MJWebSocketMgr *)socket didReceiveMessage:(id)message;
+/// 状态变更
+- (void)socket:(MJWebSocketMgr *)socket status:(MJSocketStatus)status;
+@end
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MJWebSocketMgr : NSObject
 
+@property (nonatomic, weak) id <MJWebSocketMgrDelegate> delegatge;
+
 /// init
-- (instancetype)initWithConfig:(MJSocketConfig *)config;
+- (instancetype)initWithConfig:(MJSocketConfig *)config delegate:(id <MJWebSocketMgrDelegate>)delegate;
 
 /// 开始连接
 - (void)startConnect;

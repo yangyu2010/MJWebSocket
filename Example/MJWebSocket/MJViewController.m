@@ -25,10 +25,10 @@
     config.serverURL = @"ws://localapp.musjoy.com:2345";
     config.maxReConnectCount = 5;
     
-    self.mgr = [[MJWebSocketMgr alloc] initWithConfig:config];
+    self.mgr = [[MJWebSocketMgr alloc] initWithConfig:config delegate:self];
     [self.mgr startConnect];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:MJWebSocketReceiveMessageNotification object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveMessage:) name:MJWebSocketReceiveMessageNotification object:nil];
 
 }
 

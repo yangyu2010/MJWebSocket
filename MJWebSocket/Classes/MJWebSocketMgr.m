@@ -8,13 +8,7 @@
 
 #import "MJWebSocketMgr.h"
 #import "MJWebSocket.h"
-
-
 #import <AFNetworking/AFNetworkReachabilityManager.h>
-
-NSString * const MJWebSocketReceiveMessageNotification = @"com.mjwebsocket.receive.message";
-NSString * const MJWebSocketStatusChangeNotification = @"com.mjwebsocket.status.change";
-
 
 @interface MJWebSocketMgr() <MJSocketDelegate>
 
@@ -30,10 +24,11 @@ NSString * const MJWebSocketStatusChangeNotification = @"com.mjwebsocket.status.
 
 #pragma mark- Init
 
-- (instancetype)initWithConfig:(MJSocketConfig *)config {
+- (instancetype)initWithConfig:(MJSocketConfig *)config delegate:(id <MJWebSocketMgrDelegate>)delegate {
     self = [super init];
     if (self) {
         self.config = config;
+        self.delegatge = delegate;
         [self configWebSocket];
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(noticReachabilityChange:) name:AFNetworkingReachabilityDidChangeNotification object:nil];
@@ -151,25 +146,38 @@ NSString * const MJWebSocketStatusChangeNotification = @"com.mjwebsocket.status.
 #pragma mark- MJSocketDelegate
 /// 接收到消息
 - (void)socket:(id<MJSocket>)socket didReceiveMessage:(id)message {
-    [[NSNotificationCenter defaultCenter] postNotificationName:MJWebSocketReceiveMessageNotification object:message];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:MJWebSocketReceiveMessageNotification object:message];
+    
+    if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:didReceiveMessage:)]) {
+        [self.delegatge socket:self didReceiveMessage:message];
+    }
+    
 }
 
 /// 连接成功
 - (void)socketDidOpen:(id<MJSocket>)socket {
     [self actionConnectSucceed];
-    [[NSNotificationCenter defaultCenter] postNotificationName:MJWebSocketStatusChangeNotification object:@(self.socket.status)];
+    
+    if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:status:)]) {
+        [self.delegatge socket:self status:_socket.status];
+    }
 }
 
 /// 连接失败
 - (void)socket:(id<MJSocket>)socket didFailWithError:(NSError *)error {
     [self actionConnectInterruption];
-    [[NSNotificationCenter defaultCenter] postNotificationName:MJWebSocketStatusChangeNotification object:@(self.socket.status)];
+    
+    if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:status:)]) {
+        [self.delegatge socket:self status:_socket.status];
+    }
 }
 
 /// 连接断开
 - (void)socket:(id<MJSocket>)socket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean {
     [self actionConnectInterruption];
-    [[NSNotificationCenter defaultCenter] postNotificationName:MJWebSocketStatusChangeNotification object:@(self.socket.status)];
+    if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:status:)]) {
+        [self.delegatge socket:self status:_socket.status];
+    }
 }
 
 @end

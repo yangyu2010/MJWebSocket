@@ -40,7 +40,7 @@ typedef enum : NSUInteger {
 
 @required
 /// 接收到消息
-- (void)socket:(id<MJSocket>)socket didReceiveMessage:(id)message;
+- (void)socket:(id<MJSocket>)socket didReceiveMessage:(NSDictionary *)message;
 
 @optional
 

@@ -146,12 +146,22 @@
 #pragma mark- MJSocketDelegate
 /// 接收到消息
 - (void)socket:(id<MJSocket>)socket didReceiveMessage:(id)message {
-//    [[NSNotificationCenter defaultCenter] postNotificationName:MJWebSocketReceiveMessageNotification object:message];
+  
+    // 如果是json字符串, 转成字段
+    if ([message isKindOfClass:[NSString class]]) {
+        NSDictionary *messageBody = [self.class parseJSONStringToNSDictionary:message];
+        if ([messageBody isKindOfClass:[NSDictionary class]]) {
+            if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:didReceiveMessage:)]) {
+                [self.delegatge socket:self didReceiveMessage:messageBody];
+            }
+            return ;
+        }
+    }
     
+    // 其他的数据 直接返回
     if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:didReceiveMessage:)]) {
         [self.delegatge socket:self didReceiveMessage:message];
     }
-    
 }
 
 /// 连接成功
@@ -178,6 +188,15 @@
     if (self.delegatge && [self.delegatge respondsToSelector:@selector(socket:status:)]) {
         [self.delegatge socket:self status:_socket.status];
     }
+}
+
+
+#pragma mark- Private
+/// json字符串转字典
++ (NSDictionary *)parseJSONStringToNSDictionary:(NSString *)JSONString {
+    NSData *JSONData = [JSONString dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *responseJSON = [NSJSONSerialization JSONObjectWithData:JSONData options:NSJSONReadingMutableLeaves error:nil];
+    return responseJSON;
 }
 
 @end

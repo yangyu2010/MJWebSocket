@@ -13,7 +13,7 @@
 
 @protocol MJWebSocketMgrDelegate <NSObject>
 /// 接收到消息
-- (void)socket:(MJWebSocketMgr *)socket didReceiveMessage:(id)message;
+- (void)socket:(MJWebSocketMgr *)socket didReceiveMessage:(NSDictionary *)message;
 /// 状态变更
 - (void)socket:(MJWebSocketMgr *)socket status:(MJSocketStatus)status;
 @end
